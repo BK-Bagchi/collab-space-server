@@ -21,12 +21,12 @@ userRouter.get("/me", authMiddleware, getUserProfile);
 
 userRouter.put("/me", authMiddleware, updateUserProfile);
 
-userRouter.get("/user/:id", getUserById);
+userRouter.get("/:id", getUserById);
 
-userRouter.get("/user", getAllUsers);
+userRouter.get("/", getAllUsers);
 
-userRouter.put("/user/:id/role", updateUserRole);
+userRouter.put("/:id/role", updateUserRole);
 
-userRouter.delete("/user/:id", deleteUser);
+userRouter.delete("/:id", deleteUser);
 
 export default userRouter;
