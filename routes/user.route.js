@@ -9,6 +9,7 @@ import {
   getAllUsers,
   updateUserRole,
 } from "../controller/admin.controller.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const userRouter = express.Router();
 
@@ -16,9 +17,9 @@ userRouter.get("/check", (req, res) => {
   res.send("user route");
 });
 
-userRouter.get("/me", getUserProfile);
+userRouter.get("/me", authMiddleware, getUserProfile);
 
-userRouter.put("/me", updateUserProfile);
+userRouter.put("/me", authMiddleware, updateUserProfile);
 
 userRouter.get("/user/:id", getUserById);
 
