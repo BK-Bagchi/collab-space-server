@@ -21,7 +21,7 @@ const TaskSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "low",
     },
-    attachments: [String], // URLs of uploaded files
+    attachments: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
     subtasks: [{ title: String, done: Boolean }],
   },
   { timestamps: true }
