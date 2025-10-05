@@ -10,7 +10,7 @@ const ChatSchema = new mongoose.Schema(
     },
     content: String,
     attachments: [String],
-    type: { type: String, enum: ["text", "file"], default: "text" },
+    type: { type: String, enum: ["TEXT", "FILE"], default: "TEXT" },
   },
   { timestamps: true }
 );

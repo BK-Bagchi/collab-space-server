@@ -6,8 +6,8 @@ const TaskSchema = new mongoose.Schema(
     description: String,
     status: {
       type: String,
-      enum: ["todo", "in_progress", "done"],
-      default: "todo",
+      enum: ["TODO", "IN_PROGRESS", "DONE"],
+      default: "TODO",
     },
     project: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,8 +18,8 @@ const TaskSchema = new mongoose.Schema(
     dueDate: Date,
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
-      default: "low",
+      enum: ["LOW", "MEDIUM", "HIGH"],
+      default: "LOW",
     },
     attachments: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
     subtasks: [{ title: String, done: Boolean }],
