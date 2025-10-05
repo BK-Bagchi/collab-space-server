@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 
-export const getMe = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   const { _id } = req.body;
   try {
     // const user = await User.findById(req.user._id);
@@ -11,7 +11,7 @@ export const getMe = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
-export const putMe = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   const { _id } = req.body;
   try {
     const user = await User.findByIdAndUpdate(_id, req.body).select(
