@@ -1,5 +1,5 @@
 import express from "express";
-import { getMe, putMe } from "../controller/user.controller.js";
+import { getMe, getUserById, putMe } from "../controller/user.controller.js";
 import {
   deleteUser,
   getAllUsers,
@@ -15,6 +15,8 @@ userRouter.get("/check", (req, res) => {
 userRouter.get("/me", getMe);
 
 userRouter.put("/me", putMe);
+
+userRouter.get("/user/:id", getUserById);
 
 userRouter.get("/user", getAllUsers);
 
