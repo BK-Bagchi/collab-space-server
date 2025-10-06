@@ -1,4 +1,4 @@
-import Notification from "../models/notification.model";
+import Notification from "../models/notification.model.js";
 
 export const getAllNotifications = async (req, res) => {
   const { _id } = req.user;
