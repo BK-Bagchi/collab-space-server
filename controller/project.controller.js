@@ -133,33 +133,3 @@ export const getProjectMembers = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
-
-// Search & Filtering controller
-export const searchProjects = async (req, res) => {
-  const { q } = req.query; // search keyword
-
-  try {
-    if (!q || q.trim() === "")
-      return res.status(200).json({ message: "No search keyword provided" });
-
-    // case-insensitive search using regex
-    const regex = new RegExp(q, "i");
-    const projects = await Project.find({
-      $or: [{ title: regex }, { description: regex }],
-    })
-      .populate("createdBy", "-password")
-      .populate("members", "-password")
-      .sort({ createdAt: -1 });
-
-    if (!projects.length)
-      return res.status(404).json({ message: "No projects found" });
-
-    res.status(200).json({
-      projects,
-      message: `Found ${projects.length} project(s) matching "${q}"`,
-    });
-  } catch (error) {
-    console.error("searchProjects error:", error);
-    res.status(500).json({ message: error.message || "Internal server error" });
-  }
-};

@@ -46,39 +46,3 @@ export const uploadFile = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
-
-// Search and Filtering
-export const searchMessages = async (req, res) => {
-  const { q, projectId } = req.query;
-
-  try {
-    const filter = {};
-
-    if (projectId) filter.project = projectId;
-
-    // Helper to escape regex special characters
-    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    // Text search by keyword
-    if (q) {
-      const regex = new RegExp(escapeRegex(q), "i");
-      filter.content = regex;
-    }
-
-    const chat = await Chat.find(filter)
-      .populate("sender", "-password")
-      .populate("project")
-      .sort({ createdAt: -1 });
-
-    if (!chat.length) return res.status(404).json({ message: "No chat found" });
-
-    res.status(200).json({
-      chat,
-      message: `Found ${chat.length} message(s) matching ${q} ${projectId}`,
-    });
-  } catch (error) {
-    console.error("searchMessages error:", error);
-    res.status(500).json({
-      message: error.message || "Internal server error",
-    });
-  }
-};

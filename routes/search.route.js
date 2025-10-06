@@ -1,7 +1,9 @@
 import express from "express";
-import { searchProjects } from "../controller/project.controller.js";
-import { searchTasks } from "../controller/task.controller.js";
-import { searchMessages } from "../controller/chat.controller.js";
+import {
+  searchProjects,
+  searchTasks,
+  searchMessages,
+} from "../controller/search.controller.js";
 
 const searchRouter = express.Router();
 
