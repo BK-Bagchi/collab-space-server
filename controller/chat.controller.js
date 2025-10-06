@@ -16,3 +16,18 @@ export const getAllChats = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const sendMessage = async (req, res) => {
+  const { id } = req.params; // project ID
+  const { sender, content } = req.body;
+  try {
+    const chatData = { project: id, sender, content };
+    const chat = await Chat.create(chatData);
+
+    if (!chat) return res.status(404).json({ message: "Chat not created" });
+    res.status(200).json({ chat, message: "Message sent successfully" });
+  } catch (error) {
+    console.error("sendMessage error", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
