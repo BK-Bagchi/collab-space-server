@@ -9,10 +9,11 @@ const ChatSchema = new mongoose.Schema(
       required: true,
     },
     content: String,
-    attachments: [String],
+    attachment: String,
     type: { type: String, enum: ["TEXT", "FILE"], default: "TEXT" },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Chat", ChatSchema);
+const Chat = mongoose.model("Chat", ChatSchema);
+export default Chat;
