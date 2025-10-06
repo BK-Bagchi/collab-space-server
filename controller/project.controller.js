@@ -139,9 +139,8 @@ export const searchProjects = async (req, res) => {
   const { q } = req.query; // search keyword
 
   try {
-    if (!q || q.trim() === "") {
+    if (!q || q.trim() === "")
       return res.status(200).json({ message: "No search keyword provided" });
-    }
 
     // case-insensitive search using regex
     const regex = new RegExp(q, "i");
