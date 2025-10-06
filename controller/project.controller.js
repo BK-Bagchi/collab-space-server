@@ -14,3 +14,27 @@ export const createProject = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getUserProjects = async (req, res) => {
+  const { _id } = req.user; // req.user._id from auth middleware
+
+  try {
+    const projects = await Project.find({
+      $or: [{ createdBy: _id }, { members: _id }],
+    })
+      .populate("createdBy", "name email avatar role")
+      .populate("members", "name email avatar role")
+      .sort({ createdAt: -1 });
+
+    if (!projects || projects.length === 0)
+      return res.status(404).json({ message: "No projects found" });
+    res
+      .status(200)
+      .json({ projects, message: "Projects fetched successfully" });
+  } catch (error) {
+    console.error("getUserProjects error:", error);
+    res.status(500).json({
+      message: error.message || "Internal server error",
+    });
+  }
+};
