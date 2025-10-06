@@ -10,6 +10,7 @@ import {
   updateUserRole,
 } from "../controller/admin.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { isAdmin } from "../middleware/isAdmin.js";
 
 const userRouter = express.Router();
 
@@ -21,12 +22,12 @@ userRouter.get("/me", authMiddleware, getUserProfile);
 
 userRouter.put("/me", authMiddleware, updateUserProfile);
 
-userRouter.get("/:id", getUserById);
+userRouter.get("/:id", authMiddleware, getUserById);
 
-userRouter.get("/", getAllUsers);
+userRouter.get("/", authMiddleware, isAdmin, getAllUsers);
 
-userRouter.put("/:id/role", updateUserRole);
+userRouter.put("/:id/role", authMiddleware, isAdmin, updateUserRole);
 
-userRouter.delete("/:id", deleteUser);
+userRouter.delete("/:id", authMiddleware, isAdmin, deleteUser);
 
 export default userRouter;
