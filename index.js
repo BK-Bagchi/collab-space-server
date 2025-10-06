@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import morgan from "morgan";
 import dbConnection from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
 import chatRouter from "./routes/chat.route.js";
@@ -11,6 +12,7 @@ import projectRouter from "./routes/project.route.js";
 import searchRouter from "./routes/search.route.js";
 import taskRouter from "./routes/task.route.js";
 import userRouter from "./routes/user.route.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
 
@@ -18,9 +20,10 @@ const app = express();
 const port = process.env.PORT;
 
 // ───────────────────── Middlewares ───────────────────── //
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(cors({ origin: process.env.FRONTEND_URL || "*" })); //handles which origins can make requests
+app.use(morgan("dev")); //console logs http requests. Formats: [dev, combined, common, tiny, short]
+app.use(express.json()); // sends json data
+app.use(express.urlencoded({ extended: false })); //accepts client submitted form data
 
 // ───────────────────── Routes ───────────────────── //
 app.get("/", (req, res) => {
@@ -36,6 +39,7 @@ app.use("/rest/project", projectRouter);
 app.use("/rest/search", searchRouter);
 app.use("/rest/task", taskRouter);
 app.use("/rest/user", userRouter);
+app.use(errorHandler);
 
 // ───────────────────── Database ───────────────────── //
 dbConnection();
