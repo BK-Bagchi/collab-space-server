@@ -19,3 +19,22 @@ export const getAllNotifications = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getSingleNotification = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notification = await Notification.findById(id)
+      .populate("user", "-password")
+      .populate("relatedProject")
+      .populate("relatedTask");
+
+    if (!notification)
+      return res.status(404).json({ message: "Notification not found" });
+    res
+      .status(200)
+      .json({ notification, message: "Notification fetched successfully" });
+  } catch (error) {
+    console.log("getSingleNotifications error", error);
+    res.status(500).json({ message: error.message });
+  }
+};
