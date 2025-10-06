@@ -55,3 +55,20 @@ export const getProjectDetails = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const updateProject = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const project = await Project.findByIdAndUpdate(id, req.body, {
+      new: true,
+    })
+      .populate("createdBy", "name email avatar role")
+      .populate("members", "name email avatar role");
+
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    res.status(200).json({ project, message: "Project updated successfully" });
+  } catch (error) {
+    console.error("updateProject error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
