@@ -58,3 +58,26 @@ export const markAsRead = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const createNotification = async (req, res) => {
+  const { user, type, message, relatedTask, relatedProject } = req.body;
+  try {
+    const data = {
+      user,
+      type,
+      message,
+      relatedTask: relatedTask || null,
+      relatedProject: relatedProject || null,
+    };
+    const notification = await Notification.create(data);
+
+    if (!notification)
+      return res.status(400).json({ message: "Notification not created" });
+    res
+      .status(201)
+      .json({ notification, message: "Notification created successfully" });
+  } catch (error) {
+    console.log("createNotification error", error);
+    res.status(500).json({ message: error.message });
+  }
+};
