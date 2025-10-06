@@ -38,3 +38,20 @@ export const getUserProjects = async (req, res) => {
     });
   }
 };
+
+export const getProjectDetails = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const project = await Project.findById(id)
+      .populate("createdBy", "name email avatar role")
+      .populate("members", "name email avatar role");
+
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    res
+      .status(200)
+      .json({ project, message: "Project details fetched successfully" });
+  } catch (error) {
+    console.error("getProjectDetails error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
