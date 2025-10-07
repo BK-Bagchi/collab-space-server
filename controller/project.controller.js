@@ -24,8 +24,8 @@ export const getUserProjects = async (req, res) => {
     const projects = await Project.find({
       $or: [{ createdBy: _id }, { members: _id }],
     })
-      .populate("createdBy", "name email avatar role")
-      .populate("members", "name email avatar role")
+      .populate("createdBy", "-password")
+      .populate("members", "-password")
       .sort({ createdAt: -1 });
 
     if (!projects || projects.length === 0)
@@ -45,8 +45,8 @@ export const getProjectDetails = async (req, res) => {
   const { id } = req.params;
   try {
     const project = await Project.findById(id)
-      .populate("createdBy", "name email avatar role")
-      .populate("members", "name email avatar role");
+      .populate("createdBy", "-password")
+      .populate("members", "-password");
 
     if (!project) return res.status(404).json({ message: "Project not found" });
     res
@@ -64,8 +64,8 @@ export const updateProject = async (req, res) => {
     const project = await Project.findByIdAndUpdate(id, req.body, {
       new: true,
     })
-      .populate("createdBy", "name email avatar role")
-      .populate("members", "name email avatar role");
+      .populate("createdBy", "-password")
+      .populate("members", "-password");
 
     if (!project) return res.status(404).json({ message: "Project not found" });
     res.status(200).json({ project, message: "Project updated successfully" });
@@ -79,8 +79,8 @@ export const deleteProject = async (req, res) => {
   const { id } = req.params;
   try {
     const project = await Project.findByIdAndDelete(id)
-      .populate("createdBy", "name email avatar role")
-      .populate("members", "name email avatar role");
+      .populate("createdBy", "-password")
+      .populate("members", "-password");
 
     if (!project) return res.status(404).json({ message: "Project not found" });
     res.status(200).json({ project, message: "Project deleted successfully" });
