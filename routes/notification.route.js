@@ -5,6 +5,7 @@ import {
   getSingleNotification,
   markAsRead,
 } from "../controller/notification.controller.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const notificationRouter = express.Router();
 
@@ -12,12 +13,12 @@ notificationRouter.get("/check", (req, res) => {
   res.send("notification route");
 });
 
-notificationRouter.get("/", getAllNotifications);
+notificationRouter.get("/", authMiddleware, getAllNotifications);
 
-notificationRouter.get("/:id", getSingleNotification);
+notificationRouter.get("/:id", authMiddleware, getSingleNotification);
 
-notificationRouter.patch("/:id/read", markAsRead);
+notificationRouter.patch("/:id/read", authMiddleware, markAsRead);
 
-notificationRouter.post("/", createNotification);
+notificationRouter.post("/", authMiddleware, createNotification);
 
 export default notificationRouter;
