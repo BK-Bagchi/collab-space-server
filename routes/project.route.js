@@ -9,6 +9,7 @@ import {
   updateProject,
 } from "../controller/project.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { checkProjectPermission } from "../middleware/checkProjectPermission.js";
 
 const projectRouter = express.Router();
 
@@ -22,9 +23,15 @@ projectRouter.get("/user", authMiddleware, getUserProjects);
 
 projectRouter.get("/:id", authMiddleware, getProjectDetails);
 
-projectRouter.put("/:id", authMiddleware, updateProject);
+// prettier-ignore
+projectRouter.put(
+  "/:id", authMiddleware, checkProjectPermission, updateProject
+);
 
-projectRouter.delete("/:id", authMiddleware, deleteProject);
+// prettier-ignore
+projectRouter.delete(
+  "/:id", authMiddleware, checkProjectPermission, deleteProject
+);
 
 projectRouter.post("/:id/invite", authMiddleware, inviteMember);
 
