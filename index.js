@@ -22,7 +22,7 @@ const port = process.env.PORT;
 // ───────────────────── Middlewares ───────────────────── //
 app.use(cors({ origin: process.env.FRONTEND_URL || "*" })); //handles which origins can make requests
 app.use(morgan("dev")); //console logs http requests. Formats: [dev, combined, common, tiny, short]
-app.use(express.json()); // sends json data
+app.use(express.json()); // receives json data
 app.use(express.urlencoded({ extended: false })); //accepts client submitted form data
 
 // ───────────────────── Routes ───────────────────── //

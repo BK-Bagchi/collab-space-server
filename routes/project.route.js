@@ -8,6 +8,7 @@ import {
   inviteMember,
   updateProject,
 } from "../controller/project.controller.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const projectRouter = express.Router();
 
@@ -15,18 +16,18 @@ projectRouter.get("/check", (req, res) => {
   res.send("Project route");
 });
 
-projectRouter.post("/", createProject);
+projectRouter.post("/", authMiddleware, createProject);
 
-projectRouter.get("/user", getUserProjects);
+projectRouter.get("/user", authMiddleware, getUserProjects);
 
-projectRouter.get("/:id", getProjectDetails);
+projectRouter.get("/:id", authMiddleware, getProjectDetails);
 
-projectRouter.put("/:id", updateProject);
+projectRouter.put("/:id", authMiddleware, updateProject);
 
-projectRouter.delete("/:id", deleteProject);
+projectRouter.delete("/:id", authMiddleware, deleteProject);
 
-projectRouter.post("/:id/invite", inviteMember);
+projectRouter.post("/:id/invite", authMiddleware, inviteMember);
 
-projectRouter.get("/:id/members", getProjectMembers);
+projectRouter.get("/:id/members", authMiddleware, getProjectMembers);
 
 export default projectRouter;
