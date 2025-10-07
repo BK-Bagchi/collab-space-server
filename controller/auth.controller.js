@@ -22,6 +22,7 @@ export const signup = async (req, res) => {
         message: "User not created",
       });
   } catch (error) {
+    console.error("signup error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
@@ -49,6 +50,7 @@ export const login = async (req, res) => {
       .status(200)
       .json({ message: "Login successful", user: { _id, email, role }, token });
   } catch (error) {
+    console.error("login error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };

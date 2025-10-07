@@ -3,23 +3,24 @@ import User from "../models/user.model.js";
 export const getUserProfile = async (req, res) => {
   const { _id } = req.user;
   try {
-    // const user = await User.findById(req.user._id);
     const user = await User.findById(_id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);
   } catch (error) {
+    console.error("getUserProfile error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
 export const updateUserProfile = async (req, res) => {
   const { _id } = req.user;
   try {
-    const user = await User.findByIdAndUpdate(_id, req.body).select(
-      "-password"
-    );
+    const user = await User.findByIdAndUpdate(_id, req.body, {
+      new: true,
+    }).select("-password");
     if (!user) return res.status(404).json({ message: "User not updated" });
     res.status(200).json({ user, message: "User updated successfully" });
   } catch (error) {
+    console.error("updateUserProfile error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
@@ -31,6 +32,7 @@ export const getUserById = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);
   } catch (error) {
+    console.error("getUserById error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
