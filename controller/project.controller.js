@@ -109,8 +109,7 @@ export const inviteMember = async (req, res) => {
     const notification = await Notification.create({
       user: userId,
       type: "PROJECT_INVITE",
-      message: `${req.user.email} has invited you to join ${project.name} project.`,
-      //   message: `${req.user.name} has invited you to join ${project.name} project.`,
+      message: `${req.user.name} has invited you to join '${project.title}' project(s).`,
       relatedProject: project._id,
     });
     if (!notification)
@@ -118,7 +117,12 @@ export const inviteMember = async (req, res) => {
 
     res
       .status(200)
-      .json({ notification, message: "Member invited successfully" });
+      .json({
+        notification,
+        inviter: req.user.name,
+        projectName: project.title,
+        message: "Member invited successfully",
+      });
   } catch (error) {
     console.error("inviteMember error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
