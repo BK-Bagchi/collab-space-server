@@ -29,3 +29,15 @@ export const getFileById = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const deleteFile = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const file = await File.findByIdAndDelete(id);
+    if (!file) return res.status(404).json({ message: "File not found" });
+    res.status(200).json({ file, message: "File deleted successfully" });
+  } catch (error) {
+    console.error("deleteFile error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
