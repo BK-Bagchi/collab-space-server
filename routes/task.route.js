@@ -6,6 +6,7 @@ import {
   updateSubTask,
   updateTask,
   updateTaskStatus,
+  uploadTaskAttachment,
 } from "../controller/task.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
@@ -26,5 +27,7 @@ taskRouter.delete("/:id", authMiddleware, deleteTask);
 taskRouter.patch("/:id/subtask", authMiddleware, updateSubTask);
 
 taskRouter.patch("/:id/status", authMiddleware, updateTaskStatus);
+
+taskRouter.post("/:id/attachment", authMiddleware, uploadTaskAttachment);
 
 export default taskRouter;

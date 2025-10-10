@@ -129,3 +129,30 @@ export const updateTaskStatus = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const uploadTaskAttachment = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!req.body.name || !req.body.url)
+      return res.status(400).json({ message: "File name and url is required" });
+
+    const uploadFile = await File.create(req.body);
+    if (!uploadFile)
+      return res.status(404).json({ message: "File not created" });
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      { $push: { attachments: uploadFile._id } },
+      { new: true }
+    )
+      .populate("project")
+      .populate("assignees", "-password")
+      .populate("attachments");
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    res.status(200).json({ task, message: "Attachment uploaded successfully" });
+  } catch (error) {
+    console.error("uploadTaskAttachment error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
