@@ -112,3 +112,20 @@ export const updateSubTask = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const updateTaskStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    const allowedStatuses = ["TODO", "IN_PROGRESS", "DONE"];
+    if (!allowedStatuses.includes(status))
+      return res.status(400).json({ message: "Invalid status" });
+
+    const task = await Task.findByIdAndUpdate(id, { status }, { new: true });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    res.status(200).json({ task, message: "Task status updated successfully" });
+  } catch (error) {
+    console.error("updateSubTask error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
