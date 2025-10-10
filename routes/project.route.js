@@ -2,6 +2,7 @@ import express from "express";
 import {
   createProject,
   deleteProject,
+  getFilesOfProject,
   getProjectDetails,
   getProjectMembers,
   getTasksOfProject,
@@ -39,5 +40,7 @@ projectRouter.post("/:id/invite", authMiddleware, inviteMember);
 projectRouter.get("/:id/members", authMiddleware, getProjectMembers);
 
 projectRouter.get("/:projectId/tasks", authMiddleware, getTasksOfProject);
+
+projectRouter.get("/:projectId/files", authMiddleware, getFilesOfProject);
 
 export default projectRouter;

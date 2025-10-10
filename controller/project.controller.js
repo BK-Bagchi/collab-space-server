@@ -2,6 +2,7 @@ import Project from "../models/project.model.js";
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
 import Task from "../models/task.model.js";
+import File from "../models/file.model.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -156,6 +157,23 @@ export const getTasksOfProject = async (req, res) => {
     res.status(200).json({ tasks, message: `Found ${tasks.length} tasks` });
   } catch (error) {
     console.error("getTasksOfProject error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+export const getFilesOfProject = async (req, res) => {
+  const { projectId } = req.params;
+  try {
+    const files = await File.find({ project: projectId })
+      .populate("uploadedBy", "-password")
+      .populate("project")
+      .populate("task")
+      .sort({ createdAt: -1 });
+    if (!files || files.length === 0)
+      return res.status(404).json({ message: "No files found" });
+    res.status(200).json({ files, message: `Found ${files.length} files` });
+  } catch (error) {
+    console.error("getFilesOfProject error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
