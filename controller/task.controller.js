@@ -25,3 +25,15 @@ export const getTaskById = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const updateTask = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const task = await Task.findByIdAndUpdate(id, req.body, { new: true });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    res.status(200).json({ task, message: "Task updated successfully" });
+  } catch (error) {
+    console.error("updateTask error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
