@@ -1,6 +1,7 @@
 import Project from "../models/project.model.js";
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
+import Task from "../models/task.model.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -115,14 +116,12 @@ export const inviteMember = async (req, res) => {
     if (!notification)
       return res.status(400).json({ message: "Notification not created" });
 
-    res
-      .status(200)
-      .json({
-        notification,
-        inviter: req.user.name,
-        projectName: project.title,
-        message: "Member invited successfully",
-      });
+    res.status(200).json({
+      notification,
+      inviter: req.user.name,
+      projectName: project.title,
+      message: "Member invited successfully",
+    });
   } catch (error) {
     console.error("inviteMember error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
@@ -134,6 +133,29 @@ export const getProjectMembers = async (req, res) => {
     getProjectDetails(req, res);
   } catch (error) {
     console.error("getProjectMembers error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+export const getTasksOfProject = async (req, res) => {
+  const { projectId } = req.params;
+  const { status, assignees } = req.query;
+  try {
+    const tasksOfProject = { project: projectId };
+    if (status) tasksOfProject.status = status;
+    if (assignees) tasksOfProject.assignees = assignees;
+
+    const tasks = await Task.find(tasksOfProject)
+      .populate("assignees", "-password")
+      .populate("project")
+      .populate("attachments")
+      .sort({ createdAt: -1 });
+
+    if (!tasks || tasks.length === 0)
+      return res.status(404).json({ message: "No tasks found" });
+    res.status(200).json({ tasks, message: `Found ${tasks.length} tasks` });
+  } catch (error) {
+    console.error("getTasksOfProject error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };

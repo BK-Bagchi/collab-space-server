@@ -4,6 +4,7 @@ import {
   deleteProject,
   getProjectDetails,
   getProjectMembers,
+  getTasksOfProject,
   getUserProjects,
   inviteMember,
   updateProject,
@@ -36,5 +37,7 @@ projectRouter.delete(
 projectRouter.post("/:id/invite", authMiddleware, inviteMember);
 
 projectRouter.get("/:id/members", authMiddleware, getProjectMembers);
+
+projectRouter.get("/:projectId/tasks", authMiddleware, getTasksOfProject);
 
 export default projectRouter;
