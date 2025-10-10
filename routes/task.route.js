@@ -3,6 +3,7 @@ import {
   createTask,
   deleteTask,
   getTaskById,
+  updateSubTask,
   updateTask,
 } from "../controller/task.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -20,5 +21,7 @@ taskRouter.get("/:id", authMiddleware, getTaskById);
 taskRouter.put("/:id", authMiddleware, updateTask);
 
 taskRouter.delete("/:id", authMiddleware, deleteTask);
+
+taskRouter.patch("/:id/subtask", authMiddleware, updateSubTask);
 
 export default taskRouter;
