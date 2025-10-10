@@ -2,6 +2,7 @@ import express from "express";
 import {
   createTask,
   deleteTask,
+  getFilesOfTask,
   getTaskById,
   updateSubTask,
   updateTask,
@@ -29,5 +30,7 @@ taskRouter.patch("/:id/subtask", authMiddleware, updateSubTask);
 taskRouter.patch("/:id/status", authMiddleware, updateTaskStatus);
 
 taskRouter.post("/:id/attachment", authMiddleware, uploadTaskAttachment);
+
+taskRouter.get("/:taskId/files", authMiddleware, getFilesOfTask);
 
 export default taskRouter;

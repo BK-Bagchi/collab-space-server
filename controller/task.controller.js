@@ -156,3 +156,22 @@ export const uploadTaskAttachment = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const getFilesOfTask = async (req, res) => {
+  const { taskId } = req.params;
+  try {
+    const files = await File.find({ task: taskId })
+      .populate("project")
+      .populate("uploadedBy", "-password")
+      .populate("task")
+      .sort({ createdAt: -1 });
+
+    if (!files.length)
+      return res.status(404).json({ message: "No files found for this task" });
+
+    res.status(200).json({ files, message: `Found ${files.length} files` });
+  } catch (error) {
+    console.error("getFilesOfTask error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
