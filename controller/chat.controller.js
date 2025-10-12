@@ -1,4 +1,5 @@
 import Chat from "../models/chat.model.js";
+import File from "../models/file.model.js";
 
 export const getAllChatsOfProject = async (req, res) => {
   const { id } = req.params; // project ID
@@ -17,7 +18,7 @@ export const getAllChatsOfProject = async (req, res) => {
   }
 };
 
-export const sendMessage = async (req, res) => {
+export const sendMessageToProject = async (req, res) => {
   const { id } = req.params; // project ID
   const { sender, content } = req.body;
   try {
@@ -32,12 +33,22 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-export const uploadFile = async (req, res) => {
+export const uploadFileToProject = async (req, res) => {
   const { id } = req.params; // project ID
   const { sender, attachment, type = "FILE" } = req.body;
+  const { name, url } = attachment;
   try {
-    const chatData = { project: id, sender, attachment, type };
-    const chat = await Chat.create(chatData);
+    if (!name || !url)
+      return res.status(400).json({ message: "File name and url is required" });
+    const file = await File.create(attachment);
+
+    const chatData = { project: id, sender, attachment: file._id, type };
+    const chatCreate = await Chat.create(chatData);
+    const chat = chatCreate
+      .findById(chatCreate._id)
+      .populate("attachment")
+      .populate("sender", "-password")
+      .populate("project");
 
     if (!chat) return res.status(404).json({ message: "Chat not created" });
     res.status(200).json({ chat, message: "File uploaded successfully" });

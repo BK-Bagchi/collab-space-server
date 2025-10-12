@@ -1,8 +1,8 @@
 import express from "express";
 import {
   getAllChatsOfProject,
-  sendMessage,
-  uploadFile,
+  sendMessageToProject,
+  uploadFileToProject,
 } from "../controller/chat.controller.js";
 
 const chatRouter = express.Router();
@@ -13,8 +13,8 @@ chatRouter.get("/check", (req, res) => {
 
 chatRouter.get("/:id", getAllChatsOfProject);
 
-chatRouter.post("/:id", sendMessage);
+chatRouter.post("/:id", sendMessageToProject);
 
-chatRouter.post("/:id/attachment", uploadFile);
+chatRouter.post("/:id/attachment", uploadFileToProject);
 
 export default chatRouter;
