@@ -1,5 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import expressMongoSanitize from "express-mongo-sanitize";
+import compression from "compression";
 import cors from "cors";
 import morgan from "morgan";
 import dbConnection from "./config/db.js";
@@ -20,7 +23,21 @@ const app = express();
 const port = process.env.PORT;
 
 // ───────────────────── Middlewares ───────────────────── //
-app.use(cors({ origin: process.env.FRONTEND_URL || "*" })); //handles which origins can make requests
+app.use(helmet());
+app.use((req, res, next) => {
+  if (req.body) expressMongoSanitize.sanitize(req.body);
+  if (req.params) expressMongoSanitize.sanitize(req.params);
+
+  next();
+});
+app.use(compression());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*",
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  })
+); //handles which origins can make requests
 app.use(morgan("dev")); //console logs http requests. Formats: [dev, combined, common, tiny, short]
 app.use(express.json()); // receives json data
 app.use(express.urlencoded({ extended: false })); //accepts client submitted form data
