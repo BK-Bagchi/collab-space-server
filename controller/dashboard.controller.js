@@ -86,3 +86,29 @@ export const getProjectStats = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const getTeamProductivity = async (req, res) => {
+  try {
+    const tasks = await Task.find()
+      .populate("project")
+      .populate("assignees", "-password")
+      .populate("attachments")
+      .sort({ createdAt: -1 });
+
+    if (!tasks || tasks.length === 0)
+      return res
+        .status(404)
+        .json({ message: "No tasks found for this project" });
+
+    // Aggregate per-assignee stats
+    const teamStats = assigneeActivityStats(tasks);
+
+    res.status(200).json({
+      teamStats,
+      message: "Team productivity overview fetched successfully",
+    });
+  } catch (error) {
+    console.error("getTeamProductivity error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
