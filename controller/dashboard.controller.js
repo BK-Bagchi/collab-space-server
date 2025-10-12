@@ -112,3 +112,38 @@ export const getTeamProductivity = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
+
+export const getOverdueTaskOfUser = async (req, res) => {
+  const { _id, name } = req.user;
+  try {
+    const tasks = await Task.find({
+      status: { $ne: "DONE" },
+      assignees: { $in: [_id] },
+    })
+      .populate("project")
+      .populate("assignees", "-password")
+      .populate("attachments")
+      .sort({ createdAt: -1 });
+
+    if (!tasks || tasks.length === 0)
+      return res
+        .status(404)
+        .json({ message: `${name} is not assigned to any tasks` });
+
+    const overdueTasks = tasks.filter(
+      (task) => task.dueDate && new Date(task.dueDate) < new Date()
+    );
+
+    if (!overdueTasks || overdueTasks.length === 0)
+      return res.status(404).json({ message: `${name} has no overdue tasks` });
+    overdueTasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+    res.status(200).json({
+      tasks: overdueTasks,
+      message: `Found ${overdueTasks.length} tasks of ${name}`,
+    });
+  } catch (error) {
+    console.error("getOverdueTaskOfUser error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
