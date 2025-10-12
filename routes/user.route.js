@@ -3,6 +3,7 @@ import {
   getUserProfile,
   getUserById,
   updateUserProfile,
+  updatePassword,
 } from "../controller/user.controller.js";
 import {
   deleteUser,
@@ -21,6 +22,8 @@ userRouter.get("/check", (req, res) => {
 userRouter.get("/me", authMiddleware, getUserProfile);
 
 userRouter.put("/me", authMiddleware, updateUserProfile);
+
+userRouter.patch("/me", authMiddleware, updatePassword);
 
 userRouter.get("/:id", authMiddleware, getUserById);
 
