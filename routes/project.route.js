@@ -12,6 +12,7 @@ import {
 } from "../controller/project.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { checkProjectPermission } from "../middleware/checkProjectPermission.js";
+import { isManager } from "../middleware/isManager.js";
 
 const projectRouter = express.Router();
 
@@ -19,7 +20,7 @@ projectRouter.get("/check", (req, res) => {
   res.send("Project route");
 });
 
-projectRouter.post("/", authMiddleware, createProject);
+projectRouter.post("/", authMiddleware, isManager, createProject);
 
 projectRouter.get("/user", authMiddleware, getUserProjects);
 

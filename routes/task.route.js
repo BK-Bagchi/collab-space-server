@@ -10,6 +10,7 @@ import {
   uploadTaskAttachment,
 } from "../controller/task.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { isManager } from "../middleware/isManager.js";
 
 const taskRouter = express.Router();
 
@@ -17,7 +18,7 @@ taskRouter.get("/check", (req, res) => {
   res.send("task route");
 });
 
-taskRouter.post("/", authMiddleware, createTask);
+taskRouter.post("/", authMiddleware, isManager, createTask);
 
 taskRouter.get("/:id", authMiddleware, getTaskById);
 
