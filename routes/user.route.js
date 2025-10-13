@@ -23,7 +23,7 @@ userRouter.get("/me", authMiddleware, getUserProfile);
 
 userRouter.put("/me", authMiddleware, updateUserProfile);
 
-userRouter.patch("/me", authMiddleware, updatePassword);
+userRouter.patch("/me/password", authMiddleware, updatePassword);
 
 userRouter.get("/:id", authMiddleware, getUserById);
 
