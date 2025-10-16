@@ -72,6 +72,10 @@ export const oauthLogin = async (req, res) => {
     const { email, name, picture: avatar } = payload;
 
     let user = await User.findOne({ email });
+    if (user && user.password)
+      return res
+        .status(400)
+        .json({ message: "User already exists. Login to continue" });
     if (!user)
       user = await User.create({ name, email, avatar, password: null });
 
