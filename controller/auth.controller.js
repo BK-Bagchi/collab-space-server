@@ -19,7 +19,7 @@ export const signup = async (req, res) => {
     const user = await User.create({ name, email, password: hashedPassword });
     if (user)
       res.status(201).json({
-        message: "User created successfully",
+        message: "User created successfully. Login to continue",
       });
     else
       res.status(400).json({

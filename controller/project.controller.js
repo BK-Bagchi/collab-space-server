@@ -23,18 +23,34 @@ export const getUserProjects = async (req, res) => {
   const { _id } = req.user; // req.user._id from auth middleware
 
   try {
-    const projects = await Project.find({
-      $or: [{ createdBy: _id }, { members: _id }],
+    // 1️⃣ Projects created by the user
+    const createdProjects = await Project.find({ createdBy: _id })
+      .populate("createdBy", "-password")
+      .populate("members", "-password")
+      .sort({ createdAt: -1 });
+
+    // 2️⃣ Projects where user is a member but not the creator
+    const memberProjects = await Project.find({
+      members: _id,
+      createdBy: { $ne: _id },
     })
       .populate("createdBy", "-password")
       .populate("members", "-password")
       .sort({ createdAt: -1 });
 
-    if (!projects || projects.length === 0)
-      return res.status(404).json({ message: "No projects found" });
+    if (createdProjects.length === 0 && memberProjects.length === 0)
+      return res.status(404).json({ message: "User has no projects" });
+
+    const projects = [...createdProjects, ...memberProjects];
+
     res
       .status(200)
-      .json({ projects, message: "Projects fetched successfully" });
+      .json({
+        projects,
+        totalCreated: createdProjects.length,
+        totalMember: memberProjects.length,
+        message: "Projects fetched successfully",
+      });
   } catch (error) {
     console.error("getUserProjects error:", error);
     res.status(500).json({
