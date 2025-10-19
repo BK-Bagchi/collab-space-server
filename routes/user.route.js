@@ -27,9 +27,9 @@ userRouter.patch("/me/password", authMiddleware, updatePassword);
 
 userRouter.get("/:id", authMiddleware, getUserById);
 
-userRouter.get("/", authMiddleware, isAdmin, getAllUsers);
+userRouter.get("/", authMiddleware, getAllUsers);
 
-userRouter.put("/:id/role", authMiddleware, isAdmin, updateUserRole);
+userRouter.put("/:id/role", authMiddleware, updateUserRole);
 
 userRouter.delete("/:id", authMiddleware, isAdmin, deleteUser);
 

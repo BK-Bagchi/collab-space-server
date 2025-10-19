@@ -43,14 +43,12 @@ export const getUserProjects = async (req, res) => {
 
     const projects = [...createdProjects, ...memberProjects];
 
-    res
-      .status(200)
-      .json({
-        projects,
-        totalCreated: createdProjects.length,
-        totalMember: memberProjects.length,
-        message: "Projects fetched successfully",
-      });
+    res.status(200).json({
+      projects,
+      totalCreated: createdProjects.length,
+      totalMember: memberProjects.length,
+      message: "Projects fetched successfully",
+    });
   } catch (error) {
     console.error("getUserProjects error:", error);
     res.status(500).json({
