@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  assignedTasks,
   createTask,
   deleteTask,
   getFilesOfTask,
@@ -19,6 +20,8 @@ taskRouter.get("/check", (req, res) => {
 });
 
 taskRouter.post("/", authMiddleware, isManager, createTask);
+
+taskRouter.get("/user", authMiddleware, assignedTasks);
 
 taskRouter.get("/:id", authMiddleware, getTaskById);
 

@@ -11,6 +11,28 @@ export const createTask = async (req, res) => {
   }
 };
 
+export const assignedTasks = async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const tasks = await Task.find({ assignees: _id })
+      .populate("assignees", "-password")
+      .populate("project")
+      .populate("attachments")
+      .sort({ createdAt: -1 });
+    if (!tasks || tasks.length === 0)
+      return res
+        .status(404)
+        .json({ message: "User is not assigned to any tasks yet" });
+
+    res
+      .status(200)
+      .json({ tasks, message: `Found ${tasks.length} tasks assigned to you.` });
+  } catch (error) {
+    console.error("assignedTasks error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
 export const getTaskById = async (req, res) => {
   const { id } = req.params;
   try {
