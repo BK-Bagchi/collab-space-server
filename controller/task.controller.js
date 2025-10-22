@@ -98,11 +98,14 @@ export const updateSubTask = async (req, res) => {
         return res.status(400).json({ message: "Sub task id is required" });
 
       const updateFields = {};
-      if (subtasks?.title !== undefined)
-        updateFields["subtasks.$.title"] = subtasks.title;
 
-      if (subtasks?.done !== undefined)
-        updateFields["subtasks.$.done"] = subtasks.done;
+      if (!subtasks?.title)
+        return res.status(400).json({ message: "Sub task title is required" });
+      if (subtasks?.done === undefined)
+        return res.status(400).json({ message: "Sub task status is required" });
+
+      updateFields["subtasks.$.title"] = subtasks.title;
+      updateFields["subtasks.$.done"] = subtasks.done;
 
       task = await Task.findOneAndUpdate(
         { _id: id, "subtasks._id": req.body.subTaskId },
