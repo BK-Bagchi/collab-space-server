@@ -118,7 +118,7 @@ export const inviteMember = async (req, res) => {
     // Checking if user is already a member
     if (project.members.some((memberId) => memberId.equals(userId)))
       return res
-        .status(400)
+        .status(200)
         .json({ message: "User is already a project member" });
 
     // Creating notification
