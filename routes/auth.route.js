@@ -1,6 +1,12 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { login, oauthLogin, signup } from "../controller/auth.controller.js";
+import {
+  login,
+  oauthLogin,
+  signup,
+  verifyToken,
+} from "../controller/auth.controller.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const authRouter = express.Router();
 
@@ -21,5 +27,7 @@ authRouter.post("/signup", signup);
 authRouter.post("/login", loginLimiter, login);
 
 authRouter.post("/oauth", loginLimiter, oauthLogin);
+
+authRouter.get("/verify", authMiddleware, verifyToken);
 
 export default authRouter;
