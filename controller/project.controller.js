@@ -108,34 +108,38 @@ export const deleteProject = async (req, res) => {
 
 export const inviteMember = async (req, res) => {
   const { id: projectId } = req.params;
-  const { id: userId } = req.body;
+  const { members } = req.body; // _id of users, [_id, _id, _id]
   try {
     const project = await Project.findById(projectId);
-    const user = await User.findById(userId);
-
     if (!project) return res.status(404).json({ message: "Project not found" });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    // Checking if user is already a member
-    if (project.members.some((memberId) => memberId.equals(userId)))
-      return res
-        .status(200)
-        .json({ message: "User is already a project member" });
 
-    // Creating notification
-    const notification = await Notification.create({
-      user: userId,
-      type: "PROJECT_INVITE",
-      message: `${req.user.name} has invited you to join '${project.title}' project(s).`,
-      relatedProject: project._id,
-    });
-    if (!notification)
-      return res.status(400).json({ message: "Notification not created" });
+    const notifications = [];
+    for (const memberId of members) {
+      const user = await User.findById(memberId);
+      if (!user) continue; // skip if user not found
+
+      if (project.members.some((id) => id.equals(user._id))) continue; // Skip if user already a member
+
+      // Create notification
+      const notification = await Notification.create({
+        user: user._id,
+        type: "PROJECT_INVITE",
+        message: `${req.user.name} has invited you to join '${project.title}' project.`,
+        relatedProject: project._id,
+      });
+      notifications.push(notification);
+    }
+    project.members = members; // Replace existing members with new members
+    await project.save();
 
     res.status(200).json({
-      notification,
+      notifications,
       inviter: req.user.name,
       projectName: project.title,
-      message: "Member invited successfully",
+      message:
+        notifications.length > 0
+          ? "Members invited successfully"
+          : "No new members were invited",
     });
   } catch (error) {
     console.error("inviteMember error:", error);
