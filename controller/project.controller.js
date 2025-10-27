@@ -27,6 +27,10 @@ export const getUserProjects = async (req, res) => {
     const createdProjects = await Project.find({ createdBy: _id })
       .populate("createdBy", "-password")
       .populate("members", "-password")
+      .populate({
+        path: "tasks",
+        populate: { path: "assignees", select: "-password" }, // optional
+      })
       .sort({ createdAt: -1 });
 
     // 2️⃣ Projects where user is a member but not the creator
@@ -36,6 +40,10 @@ export const getUserProjects = async (req, res) => {
     })
       .populate("createdBy", "-password")
       .populate("members", "-password")
+      .populate({
+        path: "tasks",
+        populate: { path: "assignees", select: "-password" }, // optional
+      })
       .sort({ createdAt: -1 });
 
     if (createdProjects.length === 0 && memberProjects.length === 0)
