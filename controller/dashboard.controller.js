@@ -15,11 +15,11 @@ const assigneeActivityStats = (tasks) => {
           acc[id].totalTasks += 1;
           if (task.status === "TODO") acc[id].todo += 1;
           if (task.status === "IN_PROGRESS") acc[id].inProgress += 1;
-          if (task.status === "COMPLETED") acc[id].completed += 1;
+          if (task.status === "DONE") acc[id].completed += 1;
           if (
             task.dueDate &&
             new Date(task.dueDate) < new Date() &&
-            task.status !== "COMPLETED"
+            task.status !== "DONE"
           )
             acc[id].overdue += 1;
         });
@@ -66,11 +66,7 @@ export const getProjectStats = async (req, res) => {
     const assigneeActivity = assigneeActivityStats(tasks);
 
     res.status(200).json({
-      project: {
-        _id: project._id,
-        title: project.title,
-        members: project.members,
-      },
+      project: project,
       stats: {
         totalTasks,
         todo,
