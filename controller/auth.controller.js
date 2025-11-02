@@ -44,7 +44,7 @@ export const login = async (req, res) => {
     if (!validatePassword)
       return res.status(401).json({ message: "Invalid password" });
 
-    const { _id, name, role } = user;
+    const { _id, avatar, name, role } = user;
     const token = jwt.sign(
       { _id, name, email: user.email, role },
       process.env.JWT_SECRET,
@@ -53,7 +53,7 @@ export const login = async (req, res) => {
     // prettier-ignore
     res
       .status(200)
-      .json({ message: "Login successful", user: { _id, name, email, role }, token });
+      .json({ message: "Login successful", user: { _id, name, avatar, email, role }, token });
   } catch (error) {
     console.error("login error:", error);
     res.status(500).json({ message: error.message || "Internal server error" });
