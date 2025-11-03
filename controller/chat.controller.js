@@ -1,5 +1,42 @@
 import Chat from "../models/chat.model.js";
 import File from "../models/file.model.js";
+import Project from "../models/project.model.js";
+
+export const getAllChats = async (req, res) => {
+  const { _id } = req.user;
+
+  try {
+    const chats = await Chat.find({
+      $or: [
+        { sender: _id },
+        { receiver: _id },
+        {
+          project: {
+            $in: await Project.find({
+              $or: [{ createdBy: _id }, { members: _id }],
+            }).distinct("_id"),
+          },
+        },
+      ],
+    })
+      .populate("sender", "-password")
+      .populate("receiver", "-password")
+      .populate("project")
+      .sort({ createdAt: -1 });
+
+    if (!chats || chats.length === 0)
+      return res.status(404).json({ message: "No chats found" });
+
+    res.status(200).json({
+      message: "Chats fetched successfully",
+      count: chats.length,
+      chats,
+    });
+  } catch (error) {
+    console.error("getAllChats error:", error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
 
 export const getAllChatsOfProject = async (req, res) => {
   const { id } = req.params; // project ID
