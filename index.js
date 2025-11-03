@@ -5,6 +5,8 @@ import expressMongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
 import cors from "cors";
 import morgan from "morgan";
+import http from "http";
+import { Server } from "socket.io";
 import dbConnection from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
 import chatRouter from "./routes/chat.route.js";
@@ -16,6 +18,7 @@ import searchRouter from "./routes/search.route.js";
 import taskRouter from "./routes/task.route.js";
 import userRouter from "./routes/user.route.js";
 import errorHandler from "./middleware/errorHandler.js";
+import chatSocket from "./socket/chat.socket.js";
 
 dotenv.config();
 
@@ -42,6 +45,17 @@ app.use(morgan("dev")); //console logs http requests. Formats: [dev, combined, c
 app.use(express.json()); // receives json data
 app.use(express.urlencoded({ extended: false })); //accepts client submitted form data
 
+// ───────────────────── Socket.io ───────────────────── //
+const server = http.createServer(app); // Create HTTP server and attach socket.io
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "*",
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  },
+});
+chatSocket(io);
+
 // ───────────────────── Routes ───────────────────── //
 app.get("/", (req, res) => {
   res.send(`🚀Collab Space project is running`);
@@ -62,6 +76,6 @@ app.use(errorHandler);
 dbConnection();
 
 // ───────────────────── Server ───────────────────── //
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`🚀 Server is running on ${port}`);
 });
