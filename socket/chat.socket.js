@@ -46,6 +46,15 @@ const chatSocket = (io, socket) => {
       }
     });
   });
+
+  // Handle disconnects safely
+  socket.on("disconnect", () => {
+    console.log("🔴 User left the chat:", socket.id);
+    for (const userId in users) {
+      users[userId] = users[userId].filter((id) => id !== socket.id);
+      if (users[userId].length === 0) delete users[userId];
+    }
+  });
 };
 
 export default chatSocket;
