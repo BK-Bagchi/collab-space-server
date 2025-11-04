@@ -47,6 +47,16 @@ const chatSocket = (io, socket) => {
     });
   });
 
+  // Typing indicator
+  socket.on("typing", ({ sender, receiver }) => {
+    const targetSockets = users[receiver];
+    if (targetSockets) {
+      targetSockets.forEach((id) => {
+        io.to(id).emit("typing", { sender });
+      });
+    }
+  });
+
   // Handle disconnects safely
   socket.on("disconnect", () => {
     console.log("🔴 User left the chat:", socket.id);
