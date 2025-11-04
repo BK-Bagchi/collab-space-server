@@ -54,7 +54,21 @@ const io = new Server(server, {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   },
 });
-chatSocket(io);
+
+// Central connection handler
+io.on("connection", (socket) => {
+  console.log("🟢 User connected:", socket.id);
+
+  chatSocket(io, socket);
+
+  socket.on("disconnect", () => {
+    console.log("🔴 Disconnected:", socket.id);
+    // for (const userId in users) {
+    //   users[userId] = users[userId].filter((id) => id !== socket.id);
+    //   if (users[userId].length === 0) delete users[userId];
+    // }
+  });
+});
 
 // ───────────────────── Routes ───────────────────── //
 app.get("/", (req, res) => {
