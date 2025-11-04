@@ -19,6 +19,7 @@ import taskRouter from "./routes/task.route.js";
 import userRouter from "./routes/user.route.js";
 import errorHandler from "./middleware/errorHandler.js";
 import chatSocket from "./socket/chat.socket.js";
+import activeSocket from "./socket/active.socket.js";
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("🟢 User connected:", socket.id);
 
+  activeSocket(io, socket);
   chatSocket(io, socket);
 
   socket.on("disconnect", () => {
