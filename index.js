@@ -20,6 +20,7 @@ import userRouter from "./routes/user.route.js";
 import errorHandler from "./middleware/errorHandler.js";
 import chatSocket from "./socket/chat.socket.js";
 import activeSocket from "./socket/active.socket.js";
+import projectChatSocket from "./socket/projectChat.socket.js";
 
 dotenv.config();
 
@@ -62,6 +63,7 @@ io.on("connection", (socket) => {
 
   activeSocket(io, socket);
   chatSocket(io, socket);
+  projectChatSocket(io, socket);
 
   socket.on("disconnect", () => {
     console.log("🔴 Disconnected:", socket.id);
