@@ -20,7 +20,7 @@ const projectChatSocket = (io, socket) => {
 
   // Send message in project chat
   socket.on("projectMessage", async ({ projectId, sender, content }) => {
-    const message = new ProjectChat({
+    const message = new Chat({
       sender,
       project: projectId,
       content,
