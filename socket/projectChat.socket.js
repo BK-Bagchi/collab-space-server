@@ -11,9 +11,10 @@ const projectChatSocket = (io, socket) => {
 
     console.log(`🟢📦 ${userId} joined project ${projectId}`);
 
-    const oldProjectMessages = await Chat.find({ project: projectId }).sort({
-      createdAt: 1,
-    });
+    const oldProjectMessages = await Chat.find({ project: projectId })
+      .populate("sender", "-password")
+      .populate("project")
+      .sort({ createdAt: 1 });
 
     socket.emit("oldProjectMessages", oldProjectMessages);
   });
@@ -27,8 +28,12 @@ const projectChatSocket = (io, socket) => {
     });
     await message.save();
 
+    const populatedMsg = await Chat.findById(message._id)
+      .populate("sender", "-password")
+      .populate("project");
+
     // send to all in project room
-    io.to(projectId).emit("projectMessage", message);
+    io.to(projectId).emit("projectMessage", populatedMsg);
   });
 
   socket.on("disconnect", () => {

@@ -2,7 +2,6 @@ import express from "express";
 import {
   getAllChats,
   getAllChatsOfProject,
-  getLastProjectChats,
   sendMessageToProject,
   uploadFileToProject,
 } from "../controller/chat.controller.js";
@@ -17,8 +16,6 @@ chatRouter.get("/check", (req, res) => {
 chatRouter.get("/", authMiddleware, getAllChats);
 
 chatRouter.get("/:id", authMiddleware, getAllChatsOfProject);
-
-chatRouter.get("/project/last", authMiddleware, getLastProjectChats);
 
 chatRouter.post("/:id", authMiddleware, sendMessageToProject);
 
