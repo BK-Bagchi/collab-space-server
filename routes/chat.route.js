@@ -18,7 +18,7 @@ chatRouter.get("/", authMiddleware, getAllChats);
 
 chatRouter.get("/:id", authMiddleware, getAllChatsOfProject);
 
-chatRouter.get("/lastMessage", authMiddleware, getLastProjectChats);
+chatRouter.get("/project/last", authMiddleware, getLastProjectChats);
 
 chatRouter.post("/:id", authMiddleware, sendMessageToProject);
 
