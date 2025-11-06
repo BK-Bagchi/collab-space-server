@@ -18,30 +18,33 @@ const chatSocket = (io, socket) => {
         { sender, receiver },
         { sender: receiver, receiver: sender },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .populate("sender", "-password")
+      .populate("receiver", "-password")
+      .sort({ createdAt: 1 });
 
     socket.emit("oldMessages", oldMessages);
   });
 
   // Send a new message
-  socket.on("newMessage", async ({ sender, receiver, content, attachment }) => {
-    if (!sender || !receiver || (!content && !attachment)) return;
+  socket.on("newMessage", async ({ sender, receiver, content }) => {
+    const message = new Chat({
+      sender,
+      receiver,
+      content,
+    });
+    await message.save();
 
-    let newMessage;
-    if (attachment) {
-      newMessage = new Chat({ sender, receiver, attachment, type: "FILE" });
-    } else {
-      newMessage = new Chat({ sender, receiver, content, type: "TEXT" });
-    }
-
-    await newMessage.save();
+    const populatedMsg = await Chat.findById(message._id)
+      .populate("sender", "-password")
+      .populate("receiver", "-password");
 
     // Emit message to both sender and receiver (if online)
     [sender, receiver].forEach((userId) => {
       const socketList = users[userId];
       if (socketList) {
         socketList.forEach((id) => {
-          io.to(id).emit("newMessage", newMessage);
+          io.to(id).emit("newMessage", populatedMsg);
         });
       }
     });
