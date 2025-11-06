@@ -36,6 +36,11 @@ const projectChatSocket = (io, socket) => {
     io.to(projectId).emit("projectMessage", populatedMsg);
   });
 
+  //Typing indicator
+  socket.on("typing", ({ projectId, user }) => {
+    socket.to(projectId).emit("typing", user);
+  });
+
   socket.on("disconnect", () => {
     console.log("🔴 Project Chat Disconnected:", socket.id);
     for (let project in projectRooms) {
