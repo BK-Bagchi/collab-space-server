@@ -48,6 +48,7 @@ const chatSocket = (io, socket) => {
           type: "FILE",
         };
         const chatCreate = await Chat.create(chatData);
+
         populatedMsg = await Chat.findById(chatCreate._id)
           .populate("sender", "-password")
           .populate("receiver", "-password")
@@ -58,6 +59,7 @@ const chatSocket = (io, socket) => {
           receiver,
           content,
         });
+
         populatedMsg = await Chat.findById(message._id)
           .populate("sender", "-password")
           .populate("receiver", "-password");

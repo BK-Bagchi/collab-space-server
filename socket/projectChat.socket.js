@@ -1,4 +1,5 @@
 import Chat from "../models/chat.model.js";
+import File from "../models/file.model.js";
 
 let projectRooms = {}; // { projectId: [socketIds] }
 
@@ -14,27 +15,54 @@ const projectChatSocket = (io, socket) => {
     const oldProjectMessages = await Chat.find({ project: projectId })
       .populate("sender", "-password")
       .populate("project")
+      .populate("attachment")
       .sort({ createdAt: 1 });
 
     socket.emit("oldProjectMessages", oldProjectMessages);
   });
 
   // Send message in project chat
-  socket.on("projectMessage", async ({ projectId, sender, content }) => {
-    const message = new Chat({
-      sender,
-      project: projectId,
-      content,
-    });
-    await message.save();
+  socket.on(
+    "projectMessage",
+    async ({ projectId, sender, content, attachment, type }) => {
+      let populatedMsg;
 
-    const populatedMsg = await Chat.findById(message._id)
-      .populate("sender", "-password")
-      .populate("project");
+      if (type === "FILE" && attachment) {
+        const file = await File.create({
+          name: attachment.name,
+          url: attachment.url,
+          project: projectId,
+          uploadedBy: sender,
+        });
 
-    // send to all in project room
-    io.to(projectId).emit("projectMessage", populatedMsg);
-  });
+        const chatData = {
+          sender,
+          project: projectId,
+          attachment: file._id,
+          type,
+        };
+        const chatCreate = await Chat.create(chatData);
+
+        populatedMsg = await Chat.findById(chatCreate._id)
+          .populate("sender", "-password")
+          .populate("project")
+          .populate("attachment");
+      } else {
+        const message = await Chat.create({
+          sender,
+          project: projectId,
+          content,
+        });
+
+        populatedMsg = await Chat.findById(message._id)
+          .populate("sender", "-password")
+          .populate("project");
+      }
+
+      // send to all in project room
+      io.to(projectId).emit("projectMessage", populatedMsg);
+    }
+  );
 
   //Typing indicator
   socket.on("typing", ({ projectId, user }) => {
