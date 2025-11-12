@@ -1,4 +1,5 @@
 import Chat from "../models/chat.model.js";
+import File from "../models/file.model.js";
 
 let users = {}; // { userId: [socketId1, socketId2] }
 
@@ -21,34 +22,58 @@ const chatSocket = (io, socket) => {
     })
       .populate("sender", "-password")
       .populate("receiver", "-password")
+      .populate("attachment")
       .sort({ createdAt: 1 });
 
     socket.emit("oldMessages", oldMessages);
   });
 
   // Send a new message
-  socket.on("newMessage", async ({ sender, receiver, content }) => {
-    const message = new Chat({
-      sender,
-      receiver,
-      content,
-    });
-    await message.save();
+  socket.on(
+    "newMessage",
+    async ({ sender, receiver, content, attachment, type }) => {
+      let populatedMsg;
 
-    const populatedMsg = await Chat.findById(message._id)
-      .populate("sender", "-password")
-      .populate("receiver", "-password");
-
-    // Emit message to both sender and receiver (if online)
-    [sender, receiver].forEach((userId) => {
-      const socketList = users[userId];
-      if (socketList) {
-        socketList.forEach((id) => {
-          io.to(id).emit("newMessage", populatedMsg);
+      if (type === "FILE" && attachment) {
+        const file = await File.create({
+          name: attachment.name,
+          url: attachment.url,
+          uploadedBy: sender,
         });
+
+        const chatData = {
+          sender,
+          receiver,
+          attachment: file._id,
+          type: "FILE",
+        };
+        const chatCreate = await Chat.create(chatData);
+        populatedMsg = await Chat.findById(chatCreate._id)
+          .populate("sender", "-password")
+          .populate("receiver", "-password")
+          .populate("attachment");
+      } else {
+        const message = await Chat.create({
+          sender,
+          receiver,
+          content,
+        });
+        populatedMsg = await Chat.findById(message._id)
+          .populate("sender", "-password")
+          .populate("receiver", "-password");
       }
-    });
-  });
+
+      // Emit message to both sender and receiver (if online)
+      [sender, receiver].forEach((userId) => {
+        const socketList = users[userId];
+        if (socketList) {
+          socketList.forEach((id) => {
+            io.to(id).emit("newMessage", populatedMsg);
+          });
+        }
+      });
+    }
+  );
 
   // Typing indicator
   socket.on("typing", ({ sender, receiver }) => {
