@@ -67,12 +67,16 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("🔴 Disconnected:", socket.id);
-    // for (const userId in users) {
-    //   users[userId] = users[userId].filter((id) => id !== socket.id);
-    //   if (users[userId].length === 0) delete users[userId];
-    // }
   });
 });
+
+// io accessible in http controllers
+app.set("io", io);
+// ✅ Access socket instance in controllers
+// const io = req.app.get("io");
+// Emit real-time event to that specific user
+// io.to(memberId).emit("notification", notification);
+// https://chatgpt.com/s/t_6915bf4b63e08191a3ed4ca54657375f
 
 // ───────────────────── Routes ───────────────────── //
 app.get("/", (req, res) => {
