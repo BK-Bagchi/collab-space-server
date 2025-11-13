@@ -12,6 +12,8 @@ const ChatSchema = new mongoose.Schema(
     content: String,
     attachment: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
     type: { type: String, enum: ["TEXT", "FILE"], default: "TEXT" },
+    readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isRead: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
