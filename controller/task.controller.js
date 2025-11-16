@@ -1,9 +1,20 @@
+import Activity from "../models/activity.model.js";
 import File from "../models/file.model.js";
 import Task from "../models/task.model.js";
 
 export const createTask = async (req, res) => {
   try {
     const task = await Task.create(req.body);
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "ADD_TASK",
+      message: `You created a new task "${task.title}"`,
+      relatedTask: task._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     res.status(201).json({ task, message: "Task created successfully" });
   } catch (error) {
     console.error("createTask error:", error);
@@ -53,6 +64,16 @@ export const updateTask = async (req, res) => {
   try {
     const task = await Task.findByIdAndUpdate(id, req.body, { new: true });
     if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "UPDATE_TASK",
+      message: `You updated the task "${task.title}"`,
+      relatedTask: task._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     res.status(200).json({ task, message: "Task updated successfully" });
   } catch (error) {
     console.error("updateTask error:", error);
@@ -65,6 +86,16 @@ export const deleteTask = async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(id);
     if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "DELETE_TASK",
+      message: `You deleted the task "${task.title}"`,
+      relatedTask: task._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     res.status(200).json({ task, message: "Task deleted successfully" });
   } catch (error) {
     console.error("deleteTask error:", error);
@@ -148,6 +179,18 @@ export const updateTaskStatus = async (req, res) => {
 
     const task = await Task.findByIdAndUpdate(id, { status }, { new: true });
     if (!task) return res.status(404).json({ message: "Task not found" });
+
+    if (status === "DONE") {
+      const activityLog = await Activity.create({
+        user: req.user._id,
+        type: "COMPLETE_TASK",
+        message: `You completed the task "${task.title}"`,
+        relatedTask: task._id,
+      });
+      if (!activityLog)
+        return res.status(400).json({ message: "Activity log not created" });
+    }
+
     res.status(200).json({ task, message: "Task status updated successfully" });
   } catch (error) {
     console.error("updateSubTask error:", error);

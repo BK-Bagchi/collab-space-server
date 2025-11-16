@@ -14,7 +14,7 @@ export const createProject = async (req, res) => {
     const activityLog = await Activity.create({
       user: req.user._id,
       type: "CREATE_PROJECT",
-      message: `You created the project "${project.title}"`,
+      message: `You created a new project "${project.title}"`,
       relatedProject: project._id,
     });
     if (!activityLog)
