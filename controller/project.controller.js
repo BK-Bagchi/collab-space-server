@@ -102,6 +102,16 @@ export const updateProject = async (req, res) => {
       .populate("members", "-password");
 
     if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "UPDATE_PROJECT",
+      message: `You updated the project "${project.title}"`,
+      relatedProject: project._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     res.status(200).json({ project, message: "Project updated successfully" });
   } catch (error) {
     console.error("updateProject error:", error);
@@ -149,6 +159,15 @@ export const inviteMember = async (req, res) => {
     }
     project.members = members; // Replace existing members with new members
     await project.save();
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "ADD_MEMBER",
+      message: `You invited new member(s) to the project "${project.title}"`,
+      relatedProject: project._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
 
     res.status(200).json({
       notifications,
