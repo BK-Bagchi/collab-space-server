@@ -9,6 +9,7 @@ import http from "http";
 import { Server } from "socket.io";
 import dbConnection from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
+import activityRouter from "./routes/activity.route.js";
 import chatRouter from "./routes/chat.route.js";
 import dashboardRouter from "./routes/dashboard.route.js";
 import fileRouter from "./routes/file.route.js";
@@ -84,6 +85,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/rest/auth", authRouter);
+app.use("/rest/activity", activityRouter);
 app.use("/rest/chat", chatRouter);
 app.use("/rest/dashboard", dashboardRouter);
 app.use("/rest/file", fileRouter);

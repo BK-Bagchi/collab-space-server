@@ -3,13 +3,23 @@ import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
 import Task from "../models/task.model.js";
 import File from "../models/file.model.js";
+import Activity from "../models/activity.model.js";
 
 export const createProject = async (req, res) => {
   try {
     const project = await Project.create(req.body);
-
     if (!project)
       return res.status(400).json({ message: "Project not created" });
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "CREATE_PROJECT",
+      message: `You created the project "${project.title}"`,
+      relatedProject: project._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     return res
       .status(201)
       .json({ project, message: "Project created successfully" });
