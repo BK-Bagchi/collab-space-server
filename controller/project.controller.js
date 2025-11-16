@@ -122,11 +122,24 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   const { id } = req.params;
   try {
-    const project = await Project.findByIdAndDelete(id)
+    const project = await Project.findById(id)
       .populate("createdBy", "-password")
       .populate("members", "-password");
 
     if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const projectTitle = project.title;
+    await project.deleteOne();
+
+    const activityLog = await Activity.create({
+      user: req.user._id,
+      type: "DELETE_PROJECT",
+      message: `You deleted the project "${projectTitle}"`,
+      relatedProject: project._id,
+    });
+    if (!activityLog)
+      return res.status(400).json({ message: "Activity log not created" });
+
     res.status(200).json({ project, message: "Project deleted successfully" });
   } catch (error) {
     console.error("deleteProject error:", error);
