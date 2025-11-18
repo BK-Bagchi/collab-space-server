@@ -8,6 +8,11 @@ const activeSocket = (io, socket) => {
     io.emit("activeUsers", Object.keys(users));
   });
 
+  socket.on("setup", (userId) => {
+    socket.join(userId.toString());
+    console.log(`🔥 User ${userId} joined room`, [...socket.rooms]);
+  });
+
   socket.on("disconnect", () => {
     console.log("🔴 User went offline:", socket.id);
     for (let userId in users) {
@@ -19,4 +24,12 @@ const activeSocket = (io, socket) => {
   });
 };
 
+export const sendNotification = (io, memberIds, notification) => {
+  memberIds.forEach((memberId) => {
+    const sockets = users[memberId.toString()] || [];
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("notification", notification);
+    });
+  });
+};
 export default activeSocket;

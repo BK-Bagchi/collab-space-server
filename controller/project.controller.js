@@ -1,9 +1,10 @@
+import Activity from "../models/activity.model.js";
 import Project from "../models/project.model.js";
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
 import Task from "../models/task.model.js";
 import File from "../models/file.model.js";
-import Activity from "../models/activity.model.js";
+import { sendNotification } from "../socket/active.socket.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -19,6 +20,23 @@ export const createProject = async (req, res) => {
     });
     if (!activityLog)
       return res.status(400).json({ message: "Activity log not created" });
+
+    const members = Array.isArray(req.body.members) ? req.body.members : [];
+    const io = req.app.get("io");
+    if (members.length > 0) {
+      const notifications = await Promise.all(
+        members.map((member) =>
+          Notification.create({
+            user: member,
+            type: "PROJECT_INVITE",
+            message: `You have been invited to join a new project "${project.title}"`,
+            relatedProject: project._id,
+          })
+        )
+      );
+
+      sendNotification(io, members, notifications);
+    }
 
     return res
       .status(201)

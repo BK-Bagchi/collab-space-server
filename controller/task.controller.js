@@ -1,6 +1,8 @@
 import Activity from "../models/activity.model.js";
 import File from "../models/file.model.js";
+import Notification from "../models/notification.model.js";
 import Task from "../models/task.model.js";
+import { sendNotification } from "../socket/active.socket.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -14,6 +16,24 @@ export const createTask = async (req, res) => {
     });
     if (!activityLog)
       return res.status(400).json({ message: "Activity log not created" });
+
+    //prettier-ignore
+    const assignees = Array.isArray(req.body.assignees) ? req.body.assignees : [];
+    const io = req.app.get("io");
+    if (assignees.length > 0) {
+      const notifications = await Promise.all(
+        assignees.map((assignee) =>
+          Notification.create({
+            user: assignee,
+            type: "TASK_ASSIGNED",
+            message: `You have been assigned to a new task "${task.title}"`,
+            relatedTask: task._id,
+          })
+        )
+      );
+
+      sendNotification(io, assignees, notifications);
+    }
 
     res.status(201).json({ task, message: "Task created successfully" });
   } catch (error) {
