@@ -94,6 +94,24 @@ export const updateTask = async (req, res) => {
     if (!activityLog)
       return res.status(400).json({ message: "Activity log not created" });
 
+    //prettier-ignore
+    const assignees = Array.isArray(req.body.assignees) ? req.body.assignees : [];
+    const io = req.app.get("io");
+    if (assignees.length > 0) {
+      const notifications = await Promise.all(
+        assignees.map((assignee) =>
+          Notification.create({
+            user: assignee,
+            type: "TASK_UPDATED",
+            message: `The task "${task.title}" has been updated`,
+            relatedTask: task._id,
+          })
+        )
+      );
+
+      sendNotification(io, assignees, notifications);
+    }
+
     res.status(200).json({ task, message: "Task updated successfully" });
   } catch (error) {
     console.error("updateTask error:", error);
