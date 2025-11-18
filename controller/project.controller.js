@@ -148,6 +148,7 @@ export const deleteProject = async (req, res) => {
 
     const projectTitle = project.title;
     await project.deleteOne();
+    await Task.deleteMany({ project: project._id });
 
     const activityLog = await Activity.create({
       user: req.user._id,
