@@ -22,7 +22,12 @@ const TaskSchema = new mongoose.Schema(
       default: "LOW",
     },
     attachments: [{ type: mongoose.Schema.Types.ObjectId, ref: "File" }],
-    subtasks: [{ title: String, done: { type: Boolean, default: false } }],
+    subtasks: [
+      {
+        title: { type: String, required: true },
+        done: { type: Boolean, default: false },
+      },
+    ],
   },
   { timestamps: true }
 );
