@@ -75,13 +75,10 @@ io.on("connection", (socket) => {
 app.set("io", io);
 // ✅ Access socket instance in controllers
 // const io = req.app.get("io");
-// Emit real-time event to that specific user
-// io.to(memberId).emit("notification", notification);
-// https://chatgpt.com/s/t_6915bf4b63e08191a3ed4ca54657375f
 
 // ───────────────────── Routes ───────────────────── //
 app.get("/", (req, res) => {
-  res.send(`🚀Collab Space project is running`);
+  res.redirect(process.env.FRONTEND_URL);
 });
 
 app.use("/rest/auth", authRouter);
