@@ -2,7 +2,7 @@ import Activity from "../models/activity.model.js";
 import File from "../models/file.model.js";
 import Notification from "../models/notification.model.js";
 import Task from "../models/task.model.js";
-import { sendNotification } from "../socket/active.socket.js";
+import { sendNotification } from "../socket/notification.socket.js";
 
 export const createTask = async (req, res) => {
   try {

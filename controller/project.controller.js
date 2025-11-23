@@ -3,7 +3,7 @@ import Project from "../models/project.model.js";
 import Notification from "../models/notification.model.js";
 import Task from "../models/task.model.js";
 import File from "../models/file.model.js";
-import { sendNotification } from "../socket/active.socket.js";
+import { sendNotification } from "../socket/notification.socket.js";
 
 export const createProject = async (req, res) => {
   try {
