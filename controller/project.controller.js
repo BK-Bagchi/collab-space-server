@@ -1,7 +1,6 @@
 import Activity from "../models/activity.model.js";
 import Project from "../models/project.model.js";
 import Notification from "../models/notification.model.js";
-import User from "../models/user.model.js";
 import Task from "../models/task.model.js";
 import File from "../models/file.model.js";
 import { sendNotification } from "../socket/active.socket.js";
@@ -173,24 +172,26 @@ export const inviteMember = async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const notifications = [];
-    for (const memberId of members) {
-      const user = await User.findById(memberId);
-      if (!user) continue; // skip if user not found
-
-      if (project.members.some((id) => id.equals(user._id))) continue; // Skip if user already a member
-
-      // Create notification
-      const notification = await Notification.create({
-        user: user._id,
-        type: "PROJECT_INVITE",
-        message: `${req.user.name} has invited you to join '${project.title}' project.`,
-        relatedProject: project._id,
-      });
-      notifications.push(notification);
-    }
-    project.members = members; // Replace existing members with new members
+    const newMembers = members.filter(
+      (m) => !project.members.map(String).includes(String(m))
+    );
+    if (newMembers.length === 0)
+      return res.status(400).json({ message: "No new members are invited" });
+    project.members.push(...newMembers);
     await project.save();
+
+    const io = req.app.get("io");
+    const notifications = await Promise.all(
+      newMembers.map((member) =>
+        Notification.create({
+          user: member,
+          type: "PROJECT_INVITE",
+          message: `You have been invited to join the project "${project.title}"`,
+          relatedProject: project._id,
+        })
+      )
+    );
+    sendNotification(io, newMembers, notifications);
 
     const activityLog = await Activity.create({
       user: req.user._id,
@@ -202,13 +203,9 @@ export const inviteMember = async (req, res) => {
       return res.status(400).json({ message: "Activity log not created" });
 
     res.status(200).json({
-      notifications,
       inviter: req.user.name,
       projectName: project.title,
-      message:
-        notifications.length > 0
-          ? "Members invited successfully"
-          : "No new members were invited",
+      message: "Member(s) invited successfully",
     });
   } catch (error) {
     console.error("inviteMember error:", error);
