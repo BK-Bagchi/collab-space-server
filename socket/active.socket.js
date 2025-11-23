@@ -1,4 +1,4 @@
-let users = {};
+export let users = {};
 const activeSocket = (io, socket) => {
   socket.on("becomeActive", ({ userId }) => {
     if (!users[userId]) users[userId] = [];

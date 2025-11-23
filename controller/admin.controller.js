@@ -1,4 +1,6 @@
+import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
+import { sendNotification } from "../socket/notification.socket.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -20,6 +22,15 @@ export const updateUserRole = async (req, res) => {
       { new: true }
     ).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    const io = req.app.get("io");
+    const notification = await Notification.create({
+      user: user._id,
+      type: "ROLE_UPDATE",
+      message: `Your role has been updated to ${role}`,
+    });
+    sendNotification(io, [user._id], [notification]);
+
     res.status(200).json({ user, message: "User role updated successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message || "Internal server error" });
