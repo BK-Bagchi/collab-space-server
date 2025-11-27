@@ -3,6 +3,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import { checkNoteOwner } from "../middleware/checkNoteOwner.js";
 import {
   createNote,
+  createTodo,
   deleteNote,
   getNoteDetails,
   getUserNotes,
@@ -33,5 +34,7 @@ noteRouter.patch("/:id/pin", authMiddleware, checkNoteOwner, togglePin);
 noteRouter.patch("/:id/archive", authMiddleware, checkNoteOwner, toggleArchive);
 
 noteRouter.get("/search", authMiddleware, searchNotes);
+
+noteRouter.post("/todo", authMiddleware, createTodo);
 
 export default noteRouter;

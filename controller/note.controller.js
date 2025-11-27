@@ -189,3 +189,40 @@ export const searchNotes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const createTodo = async (req, res) => {
+  const { title, type, todos } = req.body;
+  req.body.user = req.user._id;
+
+  try {
+    if (!title) return res.status(400).json({ message: "Title is required" });
+
+    if (type !== "TODO")
+      return res.status(400).json({ message: "Type must be TODO" });
+    if (!todos || todos.length === 0)
+      return res.status(400).json({ message: "Todos required for TODO notes" });
+
+    const note = await Note.create(req.body);
+
+    await Activity.create({
+      user: req.user._id,
+      type: "ADD_TODO",
+      message: `You have created a todo to the note "${note.title}"`,
+      relatedNote: note._id,
+    });
+
+    const io = req.app.get("io");
+    const notification = await Notification.create({
+      user: req.user._id,
+      type: "TODO_CREATED",
+      message: `You have created a todo to the note "${note.title}"`,
+      relatedNote: note._id,
+    });
+    sendNotification(io, [req.user._id], [notification]);
+
+    res.status(201).json({ note, message: "Todo created" });
+  } catch (error) {
+    console.error("addTodo error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
