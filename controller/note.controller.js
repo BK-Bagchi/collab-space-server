@@ -42,3 +42,20 @@ export const createNote = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getUserNotes = async (req, res) => {
+  try {
+    const notes = await Note.find({ user: req.user._id })
+      .populate("relatedTask")
+      .populate("relatedProject")
+      .sort({ pinned: -1, updatedAt: -1 });
+
+    if (!notes || notes.length === 0)
+      return res.status(404).json({ message: "No notes found" });
+
+    res.status(200).json({ notes, message: `Found ${notes.length} notes` });
+  } catch (error) {
+    console.error("getAllNotes error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
