@@ -5,6 +5,7 @@ import {
   deleteNote,
   getNoteDetails,
   getUserNotes,
+  togglePin,
   updateNote,
 } from "../controller/note.controller.js";
 import { checkNoteOwner } from "../middleware/checkNoteOwner.js";
@@ -24,5 +25,7 @@ noteRouter.get("/:id", authMiddleware, checkNoteOwner, getNoteDetails);
 noteRouter.put("/:id", authMiddleware, checkNoteOwner, updateNote);
 
 noteRouter.delete("/:id", authMiddleware, checkNoteOwner, deleteNote);
+
+noteRouter.patch("/:id/pin", authMiddleware, checkNoteOwner, togglePin);
 
 export default noteRouter;
