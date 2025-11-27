@@ -6,6 +6,7 @@ import {
   getUserNotes,
   updateNote,
 } from "../controller/note.controller.js";
+import { checkNoteOwner } from "../middleware/checkNoteOwner.js";
 
 const noteRouter = express.Router();
 
@@ -17,8 +18,8 @@ noteRouter.post("/", authMiddleware, createNote);
 
 noteRouter.get("/", authMiddleware, getUserNotes);
 
-noteRouter.get("/:id", authMiddleware, getNoteDetails);
+noteRouter.get("/:id", authMiddleware, checkNoteOwner, getNoteDetails);
 
-noteRouter.put("/:id", authMiddleware, updateNote);
+noteRouter.put("/:id", authMiddleware, checkNoteOwner, updateNote);
 
 export default noteRouter;
