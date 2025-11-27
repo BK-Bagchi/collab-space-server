@@ -228,7 +228,7 @@ export const createTodo = async (req, res) => {
 };
 
 export const updateTodo = async (req, res) => {
-  const { action, text } = req.body;
+  const { action, text, done } = req.body;
   const { id: noteId, todoId } = req.params;
   //gets req.body.todoId for update and delete
 
@@ -246,15 +246,30 @@ export const updateTodo = async (req, res) => {
     }
     // 🟡 UPDATE an existing todo
     else if (action === "update") {
-      if (!text) return res.status(400).json({ message: "Text is required" });
-      todo = await Note.findByIdAndUpdate(
-        noteId,
-        { $set: { "todos.$[todo].text": text } },
-        { new: true, arrayFilters: [{ "todo._id": todoId }] }
-      );
+      if (!todoId)
+        return res.status(400).json({ message: "Todo id is required" });
+      if (!text && done === undefined)
+        return res
+          .status(400)
+          .json({ message: "Input is required to update todo" });
+
+      const note = await Note.findById(noteId);
+      if (!note) return res.status(404).json({ message: "Note not found" });
+
+      const todoItem = note.todos.id(todoId);
+      if (!todoItem) return res.status(404).json({ message: "Todo not found" });
+
+      if (text) todoItem.text = text;
+      if (done !== undefined) todoItem.done = done;
+
+      await note.save();
+      todo = note;
     }
+
     // 🟠 DELETE an existing todo
     else if (action === "delete") {
+      if (!todoId)
+        return res.status(400).json({ message: "Todo id is required" });
       todo = await Note.findByIdAndUpdate(
         noteId,
         { $pull: { todos: { _id: todoId } } },
