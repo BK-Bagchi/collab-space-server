@@ -226,3 +226,52 @@ export const createTodo = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const updateTodo = async (req, res) => {
+  const { action, text } = req.body;
+  const { id: noteId, todoId } = req.params;
+  //gets req.body.todoId for update and delete
+
+  try {
+    let todo;
+
+    // 🟢 ADD a new todo in existing note
+    if (action === "add") {
+      if (!text) return res.status(400).json({ message: "Text is required" });
+      todo = await Note.findByIdAndUpdate(
+        noteId,
+        { $push: { todos: { text } } },
+        { new: true }
+      );
+    }
+    // 🟡 UPDATE an existing todo
+    else if (action === "update") {
+      if (!text) return res.status(400).json({ message: "Text is required" });
+      todo = await Note.findByIdAndUpdate(
+        noteId,
+        { $set: { "todos.$[todo].text": text } },
+        { new: true, arrayFilters: [{ "todo._id": todoId }] }
+      );
+    }
+    // 🟠 DELETE an existing todo
+    else if (action === "delete") {
+      todo = await Note.findByIdAndUpdate(
+        noteId,
+        { $pull: { todos: { _id: todoId } } },
+        { new: true }
+      );
+    }
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
+
+    const messages = {
+      add: "New todo created successfully",
+      update: "Todo updated successfully",
+      delete: "Todo deleted successfully",
+    };
+
+    res.status(200).json({ todo, message: messages[action] });
+  } catch (error) {
+    console.error("updateTodo error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

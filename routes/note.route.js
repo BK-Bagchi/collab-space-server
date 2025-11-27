@@ -11,6 +11,7 @@ import {
   toggleArchive,
   togglePin,
   updateNote,
+  updateTodo,
 } from "../controller/note.controller.js";
 
 const noteRouter = express.Router();
@@ -36,5 +37,8 @@ noteRouter.patch("/:id/archive", authMiddleware, checkNoteOwner, toggleArchive);
 noteRouter.get("/search", authMiddleware, searchNotes);
 
 noteRouter.post("/todo", authMiddleware, createTodo);
+
+//prettier-ignore
+noteRouter.patch("/todo/:id/:todoId", authMiddleware, checkNoteOwner, updateTodo);
 
 export default noteRouter;
