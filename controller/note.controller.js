@@ -59,3 +59,20 @@ export const getUserNotes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getNoteDetails = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const note = await Note.findById(id)
+      .populate("relatedTask")
+      .populate("relatedProject");
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    res
+      .status(200)
+      .json({ note, message: "Note details fetched successfully" });
+  } catch (error) {
+    console.error("getNoteById error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

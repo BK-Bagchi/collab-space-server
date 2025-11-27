@@ -1,6 +1,10 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { createNote, getUserNotes } from "../controller/note.controller.js";
+import {
+  createNote,
+  getNoteDetails,
+  getUserNotes,
+} from "../controller/note.controller.js";
 
 const noteRouter = express.Router();
 
@@ -11,5 +15,7 @@ noteRouter.get("/check", (req, res) => {
 noteRouter.post("/", authMiddleware, createNote);
 
 noteRouter.get("/", authMiddleware, getUserNotes);
+
+noteRouter.get("/:id", authMiddleware, getNoteDetails);
 
 export default noteRouter;
