@@ -2,6 +2,7 @@ import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
 import {
   createNote,
+  deleteNote,
   getNoteDetails,
   getUserNotes,
   updateNote,
@@ -21,5 +22,7 @@ noteRouter.get("/", authMiddleware, getUserNotes);
 noteRouter.get("/:id", authMiddleware, checkNoteOwner, getNoteDetails);
 
 noteRouter.put("/:id", authMiddleware, checkNoteOwner, updateNote);
+
+noteRouter.delete("/:id", authMiddleware, checkNoteOwner, deleteNote);
 
 export default noteRouter;

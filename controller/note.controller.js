@@ -100,3 +100,26 @@ export const updateNote = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteNote = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const note = await Note.findByIdAndDelete(id)
+      .populate("relatedTask")
+      .populate("relatedProject");
+
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    await Activity.create({
+      user: req.user._id,
+      type: "DELETE_NOTE",
+      message: `You have deleted the note "${note.title}"`,
+      relatedNote: note._id,
+    });
+
+    res.status(200).json({ message: "Note deleted successfully" });
+  } catch (error) {
+    console.error("deleteNote error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
