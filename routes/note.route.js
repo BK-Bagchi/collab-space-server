@@ -6,6 +6,7 @@ import {
   deleteNote,
   getNoteDetails,
   getUserNotes,
+  searchNotes,
   toggleArchive,
   togglePin,
   updateNote,
@@ -30,5 +31,7 @@ noteRouter.delete("/:id", authMiddleware, checkNoteOwner, deleteNote);
 noteRouter.patch("/:id/pin", authMiddleware, checkNoteOwner, togglePin);
 
 noteRouter.patch("/:id/archive", authMiddleware, checkNoteOwner, toggleArchive);
+
+noteRouter.get("/search", authMiddleware, searchNotes);
 
 export default noteRouter;

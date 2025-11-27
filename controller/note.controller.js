@@ -157,16 +157,35 @@ export const toggleArchive = async (req, res) => {
       .populate("relatedProject");
 
     if (!note) return res.status(404).json({ message: "Note not found" });
-    res
-      .status(200)
-      .json({
-        note,
-        message: `Note ${
-          note.archived ? "added to archive" : "removed from archive"
-        }`,
-      });
+    res.status(200).json({
+      note,
+      message: `Note ${
+        note.archived ? "added to archive" : "removed from archive"
+      }`,
+    });
   } catch (error) {
     console.error("toggleArchive error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const searchNotes = async (req, res) => {
+  const { q } = req.query;
+  try {
+    if (!q || q.trim() === "")
+      return res.status(400).json({ message: "Search query is required" });
+
+    const notes = await Note.find({
+      user: req.user._id,
+      $text: { $search: q },
+    })
+      .populate("relatedTask")
+      .populate("relatedProject")
+      .sort({ pinned: -1, updatedAt: -1 });
+
+    res.status(200).json({ notes, message: `Found ${notes.length} notes` });
+  } catch (error) {
+    console.error("searchNotes error:", error);
     res.status(500).json({ message: error.message });
   }
 };
