@@ -4,18 +4,18 @@ import Notification from "../models/notification.model.js";
 import { sendNotification } from "../socket/notification.socket.js";
 
 export const createNote = async (req, res) => {
-  const { type, title, content, todos } = req.body;
+  const { type, title, content } = req.body;
   req.body.user = req.user._id;
 
   try {
     if (!title) return res.status(400).json({ message: "Title is required" });
-    if (type === "TEXT" && !content)
+
+    if (type !== "TEXT")
+      return res.status(400).json({ message: "Type must be TEXT" });
+    if (!content)
       return res
         .status(400)
         .json({ message: "Content is required for text notes" });
-
-    if (type === "TODO" && (!todos || todos.length === 0))
-      return res.status(400).json({ message: "Todos required for TODO notes" });
 
     const note = await Note.create(req.body);
     if (!note) return res.status(404).json({ message: "Note not created" });

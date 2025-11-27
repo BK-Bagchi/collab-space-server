@@ -13,6 +13,7 @@ const NotificationSchema = new mongoose.Schema(
         "ROLE_UPDATE",
         "REMOVED_FROM_PROJECT",
         "NOTE_CREATED",
+        "TODO_CREATED",
       ],
       required: true,
     },
