@@ -76,3 +76,27 @@ export const getNoteDetails = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const updateNote = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const note = await Note.findByIdAndUpdate(id, req.body, { new: true })
+      .populate("relatedTask")
+      .populate("relatedProject");
+    if (!note)
+      return res.status(404).json({ message: "Note not found and updated" });
+
+    await Activity.create({
+      user: req.user._id,
+      type: "UPDATE_NOTE",
+      message: `You have updated the note "${note.title}"`,
+      relatedNote: note._id,
+    });
+
+    res.status(200).json({ note, message: "Note updated successfully" });
+  } catch (error) {
+    console.error("updateNote error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

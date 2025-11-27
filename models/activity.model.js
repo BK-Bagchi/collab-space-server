@@ -18,6 +18,8 @@ const ActivitySchema = new mongoose.Schema(
         "SEND_MESSAGE",
         "UPLOAD_FILE",
         "CREATE_NOTE",
+        "UPDATE_NOTE",
+        "DELETE_NOTE",
       ],
       required: true,
     },
