@@ -3,6 +3,7 @@ import {
   createNotification,
   getAllNotifications,
   getSingleNotification,
+  markAllAsRead,
   markAsRead,
 } from "../controller/notification.controller.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -18,6 +19,8 @@ notificationRouter.get("/", authMiddleware, getAllNotifications);
 notificationRouter.get("/:id", authMiddleware, getSingleNotification);
 
 notificationRouter.patch("/:id/read", authMiddleware, markAsRead);
+
+notificationRouter.patch("/readAll", authMiddleware, markAllAsRead);
 
 notificationRouter.post("/", authMiddleware, createNotification);
 

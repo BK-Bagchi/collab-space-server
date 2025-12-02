@@ -59,6 +59,23 @@ export const markAsRead = async (req, res) => {
   }
 };
 
+export const markAllAsRead = async (req, res) => {
+  try {
+    const result = await Notification.updateMany(
+      { user: req.user._id, read: false },
+      { $set: { read: true } }
+    );
+
+    res.status(200).json({
+      message: "All notifications marked as read",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    console.error("markAsRead error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const createNotification = async (req, res) => {
   const { user, type, message, relatedTask, relatedProject } = req.body;
   try {
