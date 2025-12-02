@@ -5,6 +5,7 @@ import {
   createNote,
   createTodo,
   deleteNote,
+  deleteTodo,
   getNoteDetails,
   getUserNotes,
   searchNotes,
@@ -39,5 +40,7 @@ noteRouter.get("/search", authMiddleware, searchNotes);
 noteRouter.post("/todo", authMiddleware, createTodo);
 
 noteRouter.put("/:id/todo", authMiddleware, checkNoteOwner, updateTodo);
+
+noteRouter.delete("/:id/todo", authMiddleware, checkNoteOwner, deleteTodo);
 
 export default noteRouter;
