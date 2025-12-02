@@ -227,6 +227,44 @@ export const createTodo = async (req, res) => {
   }
 };
 
+export const toggleTodoDone = async (req, res) => {
+  const { id, todoId } = req.params;
+
+  try {
+    const note = await Note.findOne(
+      { _id: id, "todos._id": todoId },
+      { "todos.$": 1 }
+    );
+
+    if (!note)
+      return res.status(404).json({ message: "Note or Todo not found" });
+
+    const currentDone = note.todos[0].done;
+    const updatedNote = await Note.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          "todos.$[elem].done": !currentDone,
+        },
+      },
+      {
+        new: true,
+        arrayFilters: [{ "elem._id": todoId }],
+      }
+    )
+      .populate("relatedTask")
+      .populate("relatedProject");
+
+    res.status(200).json({
+      note: updatedNote,
+      message: "Todo updated successfully",
+    });
+  } catch (error) {
+    console.error("toggleTodoDone error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const updateTodo = async (req, res) => {
   const { id } = req.params;
   try {

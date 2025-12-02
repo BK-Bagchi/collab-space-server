@@ -11,6 +11,7 @@ import {
   searchNotes,
   toggleArchive,
   togglePin,
+  toggleTodoDone,
   updateNote,
   updateTodo,
 } from "../controller/note.controller.js";
@@ -38,6 +39,9 @@ noteRouter.patch("/:id/archive", authMiddleware, checkNoteOwner, toggleArchive);
 noteRouter.get("/search", authMiddleware, searchNotes);
 
 noteRouter.post("/todo", authMiddleware, createTodo);
+
+// prettier-ignore
+noteRouter.patch("/:id/todo/:todoId", authMiddleware, checkNoteOwner, toggleTodoDone);
 
 noteRouter.put("/:id/todo", authMiddleware, checkNoteOwner, updateTodo);
 
