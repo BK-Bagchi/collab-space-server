@@ -38,7 +38,6 @@ noteRouter.get("/search", authMiddleware, searchNotes);
 
 noteRouter.post("/todo", authMiddleware, createTodo);
 
-//prettier-ignore
-noteRouter.patch("/todo/:id/:todoId", authMiddleware, checkNoteOwner, updateTodo);
+noteRouter.put("/:id/todo", authMiddleware, checkNoteOwner, updateTodo);
 
 export default noteRouter;
