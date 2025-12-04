@@ -5,12 +5,21 @@ let projectRooms = {}; // { projectId: [socketIds] }
 
 const projectChatSocket = (io, socket) => {
   // Join project room
-  socket.on("joinProject", async ({ projectId, userId }) => {
+  socket.on("joinProject", async ({ projectId, sender }) => {
     socket.join(projectId);
+
     if (!projectRooms[projectId]) projectRooms[projectId] = [];
     projectRooms[projectId].push(socket.id);
 
-    console.log(`🟢📦 ${userId} joined project ${projectId}`);
+    console.log(`🟢📦 ${sender} joined project ${projectId}`);
+
+    await Chat.updateMany(
+      {
+        project: projectId,
+        readBy: { $ne: sender },
+      },
+      { $addToSet: { readBy: sender } }
+    );
 
     const oldProjectMessages = await Chat.find({ project: projectId })
       .populate("sender", "-password")

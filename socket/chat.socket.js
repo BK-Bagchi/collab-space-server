@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Chat from "../models/chat.model.js";
 import File from "../models/file.model.js";
 
@@ -11,7 +12,18 @@ const chatSocket = (io, socket) => {
     if (!users[sender]) users[sender] = [];
     if (!users[sender].includes(socket.id)) users[sender].push(socket.id);
 
-    //   console.log(`👤 User ${sender} registered to chat with ${receiver}`);
+    console.log(`👤 User ${sender} registered to chat with ${receiver}`);
+
+    // Mark all unread messages as read
+    await Chat.updateMany(
+      {
+        $or: [
+          { sender, receiver },
+          { sender: receiver, receiver: sender },
+        ],
+      },
+      { $set: { isRead: true } }
+    );
 
     // Fetch old chat history (sorted oldest → newest)
     const oldMessages = await Chat.find({
